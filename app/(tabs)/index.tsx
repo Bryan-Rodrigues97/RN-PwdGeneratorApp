@@ -5,8 +5,9 @@ import { CheckBox } from '@/components/Checkbox';
 import { Button } from '@/components/Button';
 import Colors from '@/constants/Colors';
 import { TextWithValue } from '@/components/TextWithValue';
-import {GeneratePwd, GeneratePwd as PwdGenerator} from '../../src/util/PwdGenerator'
+import { GeneratePwd as PwdGenerator} from '../../src/util/PwdGenerator'
 import { Password } from '@/components/Password';
+
 
 export default function TabOneScreen() {
   const [pwdLenght, setPwdLenght] = useState<number>(15)
@@ -30,6 +31,7 @@ export default function TabOneScreen() {
   
   return (
     <View style={styles.container}>
+
       <Image source={require("../../assets/images/lock-icon.png")} style={styles.lockImage} resizeMode='contain'/>
       
       <View style={styles.pwdConfigArea}>
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.app.gray,   // Cor de fundo do conteúdo do modal
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-  width: '90%',                         // Ocupa 90% da largura da tela
+    width: '90%',                         // Ocupa 90% da largura da tela
     height: '60%',                      // Começa em 60% da tela
   },
 });

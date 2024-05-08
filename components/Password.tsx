@@ -1,6 +1,11 @@
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import { Button } from "./Button";
 import Colors from "@/constants/Colors";
+import * as Clipboard from 'expo-clipboard'; 
+import useStorage from "@/src/hooks/useStorage";
+import { useState } from "react";
+
+import * as React from 'react';
 
 export type PasswordProps = {
     pwd: string,
@@ -8,6 +13,33 @@ export type PasswordProps = {
 }
 
 export function Password({pwd, closeModal}: PasswordProps){
+    const [password, setPassword]   = useState(pwd)
+    const [pwdTip, setPwdTip]       = useState('')
+    
+    const pwdRef = React.useRef<TextInput>(null)
+
+    const {saveItem} = useStorage()
+
+    async function handleSave(){
+        await Clipboard.setStringAsync(password)
+
+        //TODO - Salvar objeto
+        /* 
+        {
+            tip: pwdTip,
+            pwd: password
+        }
+        */
+        await saveItem('@AppPwdGenerator',password)
+        closeModal()
+    }
+    
+    React.useEffect(() => {
+        if (pwdRef && pwdRef.current) {
+            pwdRef.current.focus();
+        }
+    }, []);
+
     return(
         <View style={styles.container}>
             <View style={styles.pwdArea}>
@@ -16,14 +48,14 @@ export function Password({pwd, closeModal}: PasswordProps){
                 </Text>
 
                 <TextInput style={styles.pwdTextArea}
-                value={pwd}
+                value={password}
+                onChangeText={setPassword}
+                autoCapitalize="none"
+                ref={pwdRef}
                 />
 
                 <View style={styles.btnArea}>
-                    <Button name="Save" buttonSize={"45%"} buttonIcon="save"  onPress={()=>{
-                        //Alert.alert("Save")
-                        closeModal()
-                    }}/>
+                    <Button name="Save" buttonSize={"45%"} buttonIcon="save"  onPress={handleSave}/>
                     <Button 
                     name="Cancel" 
                     buttonSize={"45%"} 
@@ -31,10 +63,18 @@ export function Password({pwd, closeModal}: PasswordProps){
                     buttonColor={Colors.app.black}
                     buttonTextColor={Colors.app.green}
                     onPress={()=>{
-                        //Alert.alert("Cancel")
                         closeModal()   
                     }}/>
                 </View>
+            </View>
+
+            <View style={styles.reminderArea}>
+                <Text numberOfLines={1} style={styles.pwdText}>Password Tip:</Text>
+                <TextInput style={[styles.pwdTextArea, {fontSize: 12, textAlign: "left", height: "100%"}]}
+                value={pwdTip}
+                onChangeText={setPwdTip}
+                multiline
+                />
             </View>
 
         </View>
@@ -44,11 +84,11 @@ export function Password({pwd, closeModal}: PasswordProps){
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        alignItems:"center"
     },
     pwdArea:{
+        padding: 10,
         paddingTop: 24,
-        width:"90%",
+        width:"100%",
         alignItems:"center"
     },
     pwdText:{
@@ -61,7 +101,7 @@ const styles = StyleSheet.create({
         height: 50,
         backgroundColor: "#000",
         color: "#FFF",
-        fontSize: 16,
+        fontSize: 14,
         padding: 5,
         textAlign:"center",
         fontWeight:"900",
@@ -73,4 +113,7 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         justifyContent:"space-between",
     },
+    reminderArea:{
+        padding: 10
+    }
 })

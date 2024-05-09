@@ -6,36 +6,34 @@ import { ScrollView, Swipeable } from "react-native-gesture-handler";
 import * as Clipboard from 'expo-clipboard'; 
 
 export type ItemListProps = {
-    text: string
+    password: string,
+    tip?: string
     handleDelete?: ()=> void
 }
 
-export function ItemList({text, handleDelete}: ItemListProps){
+export function ItemList({password,tip, handleDelete}: ItemListProps){
     const [showPwd, setShowPwd] = useState<boolean>(false)
     
     async function handleCopyPwd() {
-        await Clipboard.setStringAsync(text)
+        await Clipboard.setStringAsync(password)
     }
 
     return(
         <View>
-            {
-                //TODO - Estilizar o TODO
-                false &&
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <Text style={{color: Colors.app.white}} numberOfLines={1}>jnfBDEHFLOEJNFLJNAFADFCNADSJKLFVCNADSL;KNFVLKADSNFVDLNFDL;NKJ</Text>
-                </ScrollView>
-            }
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <Text style={styles.tip} numberOfLines={1}>{tip}</Text>
+            </ScrollView>
+            
             <Swipeable renderRightActions={()=>(
-                <View style={{alignItems:"center", justifyContent:"center",marginHorizontal: 15}}>
-                    <TouchableOpacity activeOpacity={0.9} onPress={handleDelete}>
+                <TouchableOpacity style={{alignItems:"center", justifyContent:"center",marginHorizontal: 15}} activeOpacity={0.9} onPress={handleDelete}>
+                    <View>
                         <FontAwesome name="trash" color={Colors.app.white} size={16} />
-                    </TouchableOpacity>
-                </View>
+                    </View>
+                </TouchableOpacity>
                 )}>
                 <Pressable onLongPress={handleCopyPwd}>
                     <View style={styles.itemListArea}>
-                        <Text style={styles.itemListTitle}>{showPwd ? text : '***********'}</Text>
+                        <Text style={styles.itemListTitle}>{showPwd ? password : '***********'}</Text>
                         <TouchableOpacity activeOpacity={0.9} onPress={()=>setShowPwd(!showPwd)}>
                             <FontAwesome name={showPwd ? "eye-slash" : "eye"} color={Colors.app.white} size={16}/>
                         </TouchableOpacity>
@@ -58,5 +56,10 @@ const styles = StyleSheet.create({
     itemListTitle:{
         color: Colors.app.white,
         fontSize: 16,
+    },
+    tip:{
+        color: Colors.app.white,
+        padding: 10,
+        fontWeight: "500"
     }
 })

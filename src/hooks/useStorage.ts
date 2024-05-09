@@ -1,7 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export type PwdType = {
+    uuid: string
+    pwd: string
+    tip: string
+}
+
 const useStorage = () => {
-    const getItem = async (key: string) => {
+
+    async function getItem(key: string): Promise<PwdType[]> {
         try{
             const passwords = await AsyncStorage.getItem(key);
 
@@ -16,7 +23,7 @@ const useStorage = () => {
         }
     }
 
-    const saveItem = async (key: string, value: string) => {
+    async function saveItem(key: string, value: PwdType){
         try{
             let passwords = await getItem(key)
 
@@ -34,7 +41,8 @@ const useStorage = () => {
             let passwords = await getItem(key)
 
             if(passwords){
-                let newPasswords = passwords.filter((v: string)=>v!=value)
+                let newPasswords = passwords.filter((v)=>v.uuid!=value)
+                
                 AsyncStorage.setItem(key,JSON.stringify(newPasswords))
             }
         }

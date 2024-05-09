@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, FlatList, TouchableOpacity, Modal } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import useStorage from '@/src/hooks/useStorage';
+import useStorage, { PwdType } from '@/src/hooks/useStorage';
 import { useFocusEffect } from 'expo-router';
 import React from 'react';
 import { FontAwesome } from '@expo/vector-icons';
@@ -12,19 +12,18 @@ import { Password } from '@/components/Password';
 
 
 export default function TabTwoScreen() {
-  const [pwdList, setPwdList] = useState<string[]>([])
+  const [pwdList, setPwdList] = useState<PwdType[]>([])
   const {getItem,removeItem} = useStorage()
 
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
-  const handleDeleteItem = (idx: number, value: string) => {
-    const newPwdList = [...pwdList];
-
-      if(newPwdList[idx] != null){
-        newPwdList.splice(idx,1);
-        setPwdList(newPwdList);
-        removePwd(value)    
-      }
+  const handleDeleteItem = (uuid: string) => {
+    
+    if(pwdList){
+      const list = pwdList.filter((item)=>item.uuid!=uuid)
+      setPwdList(list);
+      removePwd(uuid)    
+    }
   }
 
   async function removePwd(value: string) {
@@ -54,8 +53,8 @@ export default function TabTwoScreen() {
             <FlatList
             contentContainerStyle={{gap: 10}}
             data={pwdList}
-            renderItem={({item,index}) => <ItemList text={item} handleDelete={()=>handleDeleteItem(index,item)}/>}
-            keyExtractor={item=>item}
+            renderItem={({item,index}) => <ItemList password={item.pwd} tip={item.tip} handleDelete={()=>handleDeleteItem(item.uuid)}/>}
+            keyExtractor={item=>item.uuid}
             />
         </View>
         <Modal visible={modalVisible} transparent animationType='slide'>

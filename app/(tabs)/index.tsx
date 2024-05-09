@@ -1,4 +1,4 @@
-import { StyleSheet, View, Image, Text, Modal} from 'react-native';
+import { StyleSheet, View, Image, Modal, TouchableOpacity, Text} from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useState } from 'react';
 import { CheckBox } from '@/components/Checkbox';
@@ -7,6 +7,7 @@ import Colors from '@/constants/Colors';
 import { TextWithValue } from '@/components/TextWithValue';
 import { GeneratePwd as PwdGenerator} from '../../src/util/PwdGenerator'
 import { Password } from '@/components/Password';
+import { FontAwesome } from '@expo/vector-icons';
 
 
 export default function TabOneScreen() {
@@ -16,6 +17,7 @@ export default function TabOneScreen() {
   const [useLowerCase, setUserLowerCase]  = useState<boolean>(false)
   const [useNumbers, setUseNumbers]       = useState<boolean>(false)
   const [useSymbols, setUseSymbols]       = useState<boolean>(false)
+  const [showInfoUsage, setShowInfoUsage] = useState<boolean>(false)
 
   const [modalVisible, setModalVisible] = useState<boolean>(false)
   const [newPwd, setNewPwd] = useState<string>('')
@@ -30,43 +32,58 @@ export default function TabOneScreen() {
   }
   
   return (
-    <View style={styles.container}>
+    <View style={{flex:1,backgroundColor:Colors.app.black}}>
+      <TouchableOpacity>
+        <FontAwesome name='info-circle' color={Colors.app.white} size={24} style={{marginTop: 50, alignSelf:'flex-end', marginRight:15}} onPress={()=>alert(
+          `
+          Information of Usage
 
-      <Image source={require("../../assets/images/lock-icon.png")} style={styles.lockImage} resizeMode='contain'/>
-      
-      <View style={styles.pwdConfigArea}>
-        <TextWithValue text='Character Lenght' value={String(pwdLenght)}/>
+          Home Screen: Upon opening the application, users are greeted with the Home Screen. Here, they have the capability to generate strong passwords ranging from 6 to 30 characters, combining uppercase letters, lowercase letters, numbers, and symbols. After generating a password, users can save it securely within the app and set a hint to help remember it in case they forget.
+
+          Passwords Screen: In the second tab labeled "Passwords," users can view a list of passwords saved on their device along with the corresponding hints they've set. This screen enables users to navigate through their saved passwords and also delete any passwords they no longer need. Additionally, users have the option to add new passwords by tapping the "+" icon, allowing them to store any password securely on their device.
+
+          This application provides users with a convenient and secure way to manage their passwords, ensuring that they can access their accounts with ease while maintaining robust security measures.`)}/>
+      </TouchableOpacity>
+
+      <View style={styles.container}>
+
+        <Image source={require("../../assets/images/lock-icon.png")} style={styles.lockImage} resizeMode='contain'/>
         
-        <Slider
-          style={{width: "100%", height: 40}}
-          value={pwdLenght}
-          onValueChange={(value)=>setPwdLenght(Number(value.toFixed()))}
-          minimumValue={6}
-          maximumValue={30}
-          minimumTrackTintColor={Colors.app.green}
-          maximumTrackTintColor="#000"
-        />
+        <View style={styles.pwdConfigArea}>
+          <TextWithValue text='Character Lenght' value={String(pwdLenght)}/>
+          
+          <Slider
+            style={{width: "100%", height: 40}}
+            value={pwdLenght}
+            onValueChange={setPwdLenght}
+            minimumValue={6}
+            maximumValue={30}
+            minimumTrackTintColor={Colors.app.green}
+            maximumTrackTintColor="#000"
+            step={1}
+            />
 
-        <View style={styles.pwdCheckboxArea}>
-          <CheckBox text='Include Uppercase Letters' isChecked={useUpperCase} onPress={()=>setUseUpperCase(!useUpperCase)}/>
-          <CheckBox text='Include Lowercase Letters' isChecked={useLowerCase} onPress={()=>setUserLowerCase(!useLowerCase)}/>
-          <CheckBox text='Include Numbers' isChecked={useNumbers} onPress={()=>setUseNumbers(!useNumbers)}/>
-          <CheckBox text='Include Symbols' isChecked={useSymbols} onPress={()=>setUseSymbols(!useSymbols)}/>
+          <View style={styles.pwdCheckboxArea}>
+            <CheckBox text='Include Uppercase Letters' isChecked={useUpperCase} onPress={()=>setUseUpperCase(!useUpperCase)}/>
+            <CheckBox text='Include Lowercase Letters' isChecked={useLowerCase} onPress={()=>setUserLowerCase(!useLowerCase)}/>
+            <CheckBox text='Include Numbers' isChecked={useNumbers} onPress={()=>setUseNumbers(!useNumbers)}/>
+            <CheckBox text='Include Symbols' isChecked={useSymbols} onPress={()=>setUseSymbols(!useSymbols)}/>
+          </View>
+
+
+          <Button name='Generate' onPress={handlePressGeneratePwd}/>
+
         </View>
 
-
-        <Button name='Generate' onPress={handlePressGeneratePwd}/>
+        <Modal visible={modalVisible} transparent animationType='slide'>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Password pwd={newPwd} closeModal={()=>setModalVisible(false)}/>
+            </View>
+          </View>
+        </Modal>
 
       </View>
-
-      <Modal visible={modalVisible} transparent animationType='slide'>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Password pwd={newPwd} closeModal={()=>setModalVisible(false)}/>
-          </View>
-        </View>
-      </Modal>
-
     </View>
   );
 }

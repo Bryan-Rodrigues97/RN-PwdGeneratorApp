@@ -1,9 +1,10 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { Button } from "./Button";
 import Colors from "@/constants/Colors";
 import * as Clipboard from 'expo-clipboard'; 
-import useStorage from "@/src/hooks/useStorage";
+import useStorage, { PwdType } from "@/src/hooks/useStorage";
 import { useState } from "react";
+import uuid from 'react-native-uuid';
 
 import * as React from 'react';
 
@@ -21,16 +22,20 @@ export function Password({pwd, closeModal}: PasswordProps){
     const {saveItem} = useStorage()
 
     async function handleSave(){
-        await Clipboard.setStringAsync(password)
-
-        //TODO - Salvar objeto
-        /* 
-        {
-            tip: pwdTip,
-            pwd: password
+        if(!password){
+            Alert.alert("Warning", "Cannot save an blank password")
+            return
         }
-        */
-        await saveItem('@AppPwdGenerator',password)
+
+        await Clipboard.setStringAsync(password)
+        
+        let oPwd: PwdType = {
+            uuid: String(uuid.v4()),
+            pwd: password,
+            tip: pwdTip
+        }
+        
+        await saveItem('@AppPwdGenerator',oPwd)
         closeModal()
     }
     
@@ -39,8 +44,9 @@ export function Password({pwd, closeModal}: PasswordProps){
             pwdRef.current.focus();
         }
     }, []);
-
+    
     return(
+       
         <View style={styles.container}>
             <View style={styles.pwdArea}>
                 <Text style={styles.pwdText}>
@@ -67,15 +73,19 @@ export function Password({pwd, closeModal}: PasswordProps){
                     }}/>
                 </View>
             </View>
-
-            <View style={styles.reminderArea}>
-                <Text numberOfLines={1} style={styles.pwdText}>Password Tip:</Text>
-                <TextInput style={[styles.pwdTextArea, {fontSize: 12, textAlign: "left", height: "100%"}]}
-                value={pwdTip}
-                onChangeText={setPwdTip}
-                multiline
-                />
-            </View>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                >
+                <View style={styles.reminderArea}>
+                    <Text numberOfLines={1} style={styles.pwdText}>Password Tip:</Text>
+                    <TextInput style={[styles.pwdTextArea, {fontSize: 12, textAlign: "left", height: "50%", textAlignVertical:"top"}]}
+                    value={pwdTip}
+                    onChangeText={setPwdTip}
+                    multiline
+                    defaultValue=""
+                    />
+                </View>
+            </KeyboardAvoidingView>
 
         </View>
     )
